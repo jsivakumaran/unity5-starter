@@ -39,7 +39,7 @@ public class SimpleCharacter : MonoBehaviour {
 		//use flags to determine whether a player can jump or not.  i.e. so that a user doesn't jump while already in the air
 		//if on ground 
 		//set canJump to true
-		if ((flags & CollisionFlags.Below) != 0) {
+		if ((flags & (CollisionFlags.Sides | CollisionFlags.Below)) != 0) {
 			canJump = true;
 			verticalVelocity = 0f;
 		}
