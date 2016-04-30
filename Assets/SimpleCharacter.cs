@@ -9,6 +9,7 @@ public class SimpleCharacter : MonoBehaviour {
 	public float jumpSpeed = 10f;
 	public Transform CameraTransform;
 	bool canJump = false;
+	float verticalVelocity;
 
 
 	// Update is called once per frame
@@ -18,10 +19,13 @@ public class SimpleCharacter : MonoBehaviour {
 		//get input from player
 		myVector.x = Input.GetAxis("Horizontal");
 		myVector.z = Input.GetAxis("Vertical");
+		myVector = Vector3.ClampMagnitude(myVector, 1f);
 		myVector = myVector * speed * Time.deltaTime;  //Make it move with a particular speed
 		//use input to move the character around
-		myVector = CameraTransform.rotation * myVector; //rotate input to direction of camera
-		float verticalVelocity =MyController.velocity.y - gravityStrength*Time.deltaTime;
+		Quaternion inputRotation = Quaternion.LookRotation(Vector3.ProjectOnPlane(CameraTransform.forward, Vector3.up), Vector3.up);
+		myVector = inputRotation * myVector; //rotate input to direction of camera
+
+		verticalVelocity = verticalVelocity - gravityStrength*Time.deltaTime;
 		//How do we get the jump key?
 		if(Input.GetButtonDown("Jump")){
 			//add jumpspeed to vertical velocity
@@ -35,8 +39,10 @@ public class SimpleCharacter : MonoBehaviour {
 		//use flags to determine whether a player can jump or not.  i.e. so that a user doesn't jump while already in the air
 		//if on ground 
 		//set canJump to true
-		if((flags & CollisionFlags.Below) !=0)
+		if ((flags & CollisionFlags.Below) != 0) {
 			canJump = true;
+			verticalVelocity = 0f;
+		}
 		else
 			canJump = false;
 	}
