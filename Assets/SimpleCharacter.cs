@@ -8,6 +8,7 @@ public class SimpleCharacter : MonoBehaviour {
 	public float gravityStrength = 5f;  //gravity constant of earth is 9.8 - you may remember it from high school physics
 	public float jumpSpeed = 10f;
 	public Transform CameraTransform;
+	bool canJump = false;
 
 
 	// Update is called once per frame
@@ -24,11 +25,19 @@ public class SimpleCharacter : MonoBehaviour {
 		//How do we get the jump key?
 		if(Input.GetButtonDown("Jump")){
 			//add jumpspeed to vertical velocity
-
-			verticalVelocity += jumpSpeed;
+			if(canJump)
+				verticalVelocity += jumpSpeed;
 		}
 
 		myVector.y = verticalVelocity*Time.deltaTime; //add new speed to old speed to mimick acceleration
-		MyController.Move(myVector); //can use SimpleMove or Move(this is more complex)
+		CollisionFlags flags = MyController.Move(myVector); //can use SimpleMove or Move(this is more complex)
+
+		//use flags to determine whether a player can jump or not.  i.e. so that a user doesn't jump while already in the air
+		//if on ground 
+		//set canJump to true
+		if((flags & CollisionFlags.Below) !=0)
+			canJump = true;
+		else
+			canJump = false;
 	}
 }
